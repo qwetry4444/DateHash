@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace DateHash
+﻿namespace DateHash
 {
     public class Generator
     {
@@ -17,10 +11,10 @@ namespace DateHash
             usedKeys = new HashSet<Date>();
         }
 
-        public void KeyGenerate(List<Date> dates, int hashTableSize = 2000)
+        public void KeyGenerate(List<Date> dates, int generateCount = 2000)
         {
             Date date;
-            for (int i = 0; i < hashTableSize;)
+            for (int i = 0; i < generateCount;)
             {
                 date = GenerateDate();
                 if (usedKeys.Contains(date))
@@ -38,28 +32,25 @@ namespace DateHash
             Date date = new Date();
             date.Day = random.Next(1, 32); 
             date.Month = random.Next(1, 13);
-            date.Year = GenerateRandomYear();
+            date.Year = GenerateYear();
             return date;
         }
 
-        // Диапазон измениния Year [1920, 2008] величина изменяется по нормальному закону с максимумом в 1970
-        private int GenerateRandomYear()
+        private int GenerateYear()
         {
-            double maxYear = 1970;
-            double stdDev = (maxYear - 1920) / 3.0; // Стандартное отклонение для нормального распределения
-            double mean = (1920 + maxYear) / 2.0; // Среднее значение для нормального распределения
+            const double mu = 1970; // Среднее значение (центр нормального распределения).
+            const double sigma = 13; // Стандартное отклонение.
 
-            // Генерируем случайный год на основе нормального распределения
-            double u1 = 1.0 - random.NextDouble(); // Случайное число от 0 до 1
-            double u2 = 1.0 - random.NextDouble(); // Случайное число от 0 до 1
-            double randStdNormal = Math.Sqrt(-2.0 * Math.Log(u1)) * Math.Sin(2.0 * Math.PI * u2); // Нормально распределенное случайное число
-            double randNormal = mean + stdDev * randStdNormal; // Нормально распределенное число со сдвигом и масштабированием
+            // Генерируем случайную величину с нормальным распределением.
+            double u1 = 1.0 - random.NextDouble(); // Случайное число от 0 до 1.
+            double u2 = 1.0 - random.NextDouble(); // Следующее случайное число от 0 до 1.
+            double randStdNormal = Math.Sqrt(-2.0 * Math.Log(u1)) * Math.Sin(2.0 * Math.PI * u2); // Случайная величина с нормальным распределением.
 
-            // Ограничиваем значение года диапазоном
-            int generatedYear = (int)Math.Round(randNormal);
-            generatedYear = Math.Max(1920, Math.Min(2008, generatedYear));
+            // Преобразуем нормальную величину в год.
+            int year = (int)(mu + sigma * randStdNormal);
 
-            return generatedYear;
+            // Убеждаемся, что год находится в допустимом диапазоне (1920-2008).
+            return Math.Max(1920, Math.Min(2008, year));
         }
     }
 }

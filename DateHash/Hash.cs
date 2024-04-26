@@ -3,17 +3,21 @@ namespace DateHash
 {
     public static class Hash
     {
-        public static int HashDate(Date date)
+        public static int HashDate(Date date, int hashTableSize)
         {
-            int hash = 0;
+            int hash = 55;
 
-            hash = ((date.Year - 1920) * 10000 + date.Month + 100 + date.Day) % 256;
-            Random random = new Random(date.GetHashCode());
-            hash = (hash + random.Next(256)) % 256;
-            return hash ;
+            if (date.Year == 1970)
+            {
+                hash += 200;
+            }
+
+            hash = hash * 31 + (date.Year - 1920);
+            hash = hash * 31 + date.Month;
+            hash = hash * 31 + date.Day;
+
+            hash += 15;
+            return hash % hashTableSize;
         }
-        
-
-
     }
 }
